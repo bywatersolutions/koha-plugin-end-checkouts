@@ -1,0 +1,78 @@
+[% INCLUDE 'doc-head-open.inc' %]
+ <title>Koha: Koha End Checkout Plugin</title>
+[% INCLUDE 'doc-head-close.inc' %]
+</head>
+<body>
+[% INCLUDE 'header.inc' %]
+[% INCLUDE 'cat-search.inc' %]
+[% USE KohaDates %]
+
+<div id="breadcrumbs"><a href="/cgi-bin/koha/mainpage.pl">Home</a> &rsaquo; <a href="/cgi-bin/koha/plugins/plugins-home.pl">Plugins</a> &rsaquo; 
+    <a href="/cgi-bin/koha/plugins/run.pl?class=Koha%3A%3APlugin%3A%3ACom%3A%3AByWaterSolutions%3A%3AEndCheckout&method=tool">End checkin plugin</a> &rsaquo; Step 2</div>
+
+<div id="doc3">
+
+    <!-- Notice our form here has no 'action', this is good, it means that our forms will always get passed back to 'plugins/run.pl'. You could hard code it instead if you prefer -->
+
+    [% IF problem_barcodes.size %]
+        <div class="dialog alert">
+            <p>Warning, the following barcodes were not found:</p>
+            <table style="margin:auto;">
+                <thead>
+                    <tr>
+                        <th>Barcode</th>
+                        <th>Problem</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    [% FOREACH barcode IN problem_barcodes %]
+                        <tr>
+                            <td>[% barcode.barcode | html %]</td>
+                            <td>[% barcode.problem | html %]</td>
+                        </tr>
+                    [% END %]
+                </tbody>
+            </table>
+        </div>
+    [% END %]
+
+    [% IF return_items.size %]
+    <form method="post">
+        <input type="hidden" name="class" value="[% CLASS %]"/>
+        <input type="hidden" name="method" value="[% METHOD %]"/>
+
+        <br/>
+        <h1>Items to return</h1>
+        <table style="margin:auto;">
+            <thead>
+                <tr>
+                <th>Barcode</th>
+                <th>Title</th>
+                <th>Date due</th>
+                <th>Date lost</th>
+                <th>Borrower</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    [% FOREACH item IN return_items %]
+                       <td>[% item.barcode | html %]
+                           <input type="hidden" name="return_items" value="[% item.itemnumber | html %]">
+                       </td>
+                       <td>[% item.biblio.title _ item.biblio.subtitle %]</td>
+                       <td>[% item.checkout.date_due | $KohaDates as_due_date => 1 %]</td>
+                       <td>[% item.itemlost_on | html %]</td>
+                       <td>[% INCLUDE 'patron-title.inc' patron=item.checkout.patron hide_patron_infos_if_needed=1 %]</td>
+                    [% END %]
+                </tr>
+            </tbody>
+        </table>
+
+        <input name="confirmed" type="submit" value="Return items" />
+    </form>
+    [% ELSE %]
+        <h3>No items to return</h3>
+        <a href="/cgi-bin/koha/plugins/run.pl?class=Koha%3A%3APlugin%3A%3ACom%3A%3AByWaterSolutions%3A%3AEndCheckout&method=tool">Return to step 1</a>
+    [% END %]
+
+[% INCLUDE 'intranet-bottom.inc' %]

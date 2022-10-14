@@ -1,0 +1,62 @@
+[% INCLUDE 'doc-head-open.inc' %]
+ <title>Koha: Koha End Checkout Plugin</title>
+[% INCLUDE 'doc-head-close.inc' %]
+</head>
+<body>
+[% INCLUDE 'header.inc' %]
+[% INCLUDE 'cat-search.inc' %]
+[% USE KohaDates %]
+
+<div id="breadcrumbs"><a href="/cgi-bin/koha/mainpage.pl">Home</a> &rsaquo; <a href="/cgi-bin/koha/plugins/plugins-home.pl">Plugins</a> &rsaquo; 
+    <a href="/cgi-bin/koha/plugins/run.pl?class=Koha%3A%3APlugin%3A%3ACom%3A%3AByWaterSolutions%3A%3AEndCheckout&method=tool">End checkin plugin</a> &rsaquo; Step 3</div>
+
+<div id="doc3">
+
+    <!-- Notice our form here has no 'action', this is good, it means that our forms will always get passed back to 'plugins/run.pl'. You could hard code it instead if you prefer -->
+
+    [% IF problem_barcodes.size %]
+        <div class="dialog alert">
+            <p>Warning, the following barcodes were not found:</p>
+            <table style="margin:auto;">
+                <thead>
+                    <tr>
+                        <th>Barcode</th>
+                        <th>Problem</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    [% FOREACH barcode IN problem_barcodes %]
+                        <tr><td>[% barcode.barcode | html %]</td></tr>
+                        <tr><td>[% barcode.problem | html %]</td></tr>
+                    [% END %]
+                </tbody>
+            </table>
+        </div>
+    [% END %]
+
+
+    [% IF returned_items.size %]
+    <br/>
+    <h1>Returned items</h1>
+    <table style="margin:auto;">
+        <thead>
+            <tr>
+            <th>Barcode</th>
+            <th>Title</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                [% FOREACH item IN returned_items %]
+                   <td>[% item.barcode | html %]</td>
+                   <td>[% item.biblio.title _ item.biblio.subtitle %]</td>
+                [% END %]
+            </tr>
+        </tbody>
+    </table>
+    [% ELSE %]
+       <h3>There were no items returned</h3>
+    [% END %]
+    <a href="/cgi-bin/koha/plugins/run.pl?class=Koha%3A%3APlugin%3A%3ACom%3A%3AByWaterSolutions%3A%3AEndCheckout&method=tool">Return to step 1</a>
+
+[% INCLUDE 'intranet-bottom.inc' %]
