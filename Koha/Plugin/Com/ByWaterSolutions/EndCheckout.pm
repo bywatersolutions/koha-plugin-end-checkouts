@@ -10,6 +10,7 @@ use base qw(Koha::Plugins::Base);
 use C4::Auth;
 use C4::Context;
 use C4::Circulation;
+use C4::Log;
 
 use Koha::Items;
 
@@ -31,7 +32,7 @@ our $metadata = {
     minimum_version => $MINIMUM_VERSION,
     maximum_version => undef,
     version         => $VERSION,
-    description     => 'This plugin implements an option to end a checkout for a lost item'
+    description     => 'This plugin implements an option to end a checkout'
       . 'without performing a "return" to avoid refunding lost fees or marking the item as found',
 };
 
@@ -126,11 +127,7 @@ sub tool_step2 {
     while( my $item = $items->next ){
         push @seen, $item->barcode;
         if( $item->checkout ){
-            if( $item->itemlost ){
-                push @items_to_return, $item;
-            } else {
-                push @problem_barcodes, { barcode => $item->barcode, problem => "Item not lost" };
-            }
+            push @items_to_return, $item;
         } else {
             push @problem_barcodes, { barcode => $item->barcode, problem => "Item not checked out" };
         }
@@ -163,15 +160,17 @@ sub tool_step3 {
     my @problem_barcodes;
     my @returned_items;
     while( my $item = $items->next ){
-        unless( $item->itemlost && $item->checkout ){
-            push @problem_barcodes, { barcode => $item->barcode, problem => "Item not eligible for return via this plugin" };
-            next;
-        }
-        my $returned = C4::Circulation::MarkIssueReturned( $item->checkout->borrowernumber, $item->itemnumber, undef, $item->checkout->patron->privacy );
-        if( $returned ){
-            push @returned_items, $item;
+        if( $item->checkout ){
+            my $checkout = $item->checkout;
+            my $returned = C4::Circulation::MarkIssueReturned( $checkout->borrowernumber, $item->itemnumber, undef, $checkout->patron->privacy );
+            if( $returned ){
+                push @returned_items, $item;
+                C4::Log::logaction("CIRCULATION","RETURN",$checkout->borrowernumber,"Return of issue:".$checkout->id." item:".$item->id." forced via EndCheckout plugin");
+            } else {
+                push @problem_barcodes, { barcode => $item->barcode, problem => "There was a problem returning this item" };
+            }
         } else {
-            push @problem_barcodes, { barcode => $item->barcode, problem => "There was a problem returning this item" };
+            push @problem_barcodes, { barcode => $item->barcode, problem => "This item was not checked out" };
         }
     }
     

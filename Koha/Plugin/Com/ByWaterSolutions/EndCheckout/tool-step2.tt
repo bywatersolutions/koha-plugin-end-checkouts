@@ -50,6 +50,8 @@
                 <th>Title</th>
                 <th>Date due</th>
                 <th>Date lost</th>
+                <th>Date withdrawn</th>
+                <th>Damaged</th>
                 <th>Borrower</th>
                 </tr>
             </thead>
@@ -62,6 +64,8 @@
                        <td>[% item.biblio.title _ item.biblio.subtitle %]</td>
                        <td>[% item.checkout.date_due | $KohaDates as_due_date => 1 %]</td>
                        <td>[% item.itemlost_on | html %]</td>
+                       <td>[% item.withdrawn_on | html %]</td>
+                       <td>[% item.damaged | html %]</td>
                        <td>[% INCLUDE 'patron-title.inc' patron=item.checkout.patron hide_patron_infos_if_needed=1 %]</td>
                     [% END %]
                 </tr>

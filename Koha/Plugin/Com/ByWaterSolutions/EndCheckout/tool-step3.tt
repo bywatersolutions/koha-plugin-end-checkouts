@@ -26,8 +26,10 @@
                 </thead>
                 <tbody>
                     [% FOREACH barcode IN problem_barcodes %]
-                        <tr><td>[% barcode.barcode | html %]</td></tr>
-                        <tr><td>[% barcode.problem | html %]</td></tr>
+                        <tr>
+                            <td>[% barcode.barcode | html %]</td>
+                            <td>[% barcode.problem | html %]</td>
+                        </tr>
                     [% END %]
                 </tbody>
             </table>
