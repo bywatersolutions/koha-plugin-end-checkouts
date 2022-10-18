@@ -56,8 +56,8 @@
                 </tr>
             </thead>
             <tbody>
-                <tr>
-                    [% FOREACH item IN return_items %]
+                [% FOREACH item IN return_items %]
+                    <tr>
                        <td>[% item.barcode | html %]
                            <input type="hidden" name="return_items" value="[% item.itemnumber | html %]">
                        </td>
@@ -67,8 +67,8 @@
                        <td>[% item.withdrawn_on | html %]</td>
                        <td>[% item.damaged | html %]</td>
                        <td>[% INCLUDE 'patron-title.inc' patron=item.checkout.patron hide_patron_infos_if_needed=1 %]</td>
-                    [% END %]
-                </tr>
+                    </tr>
+                [% END %]
             </tbody>
         </table>
 

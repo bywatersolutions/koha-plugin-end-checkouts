@@ -43,17 +43,19 @@
     <table style="margin:auto;">
         <thead>
             <tr>
-            <th>Barcode</th>
-            <th>Title</th>
+                <th>Barcode</th>
+                <th>Title</th>
+                <th>Borrower</th>
             </tr>
         </thead>
         <tbody>
-            <tr>
-                [% FOREACH item IN returned_items %]
+            [% FOREACH item IN returned_items %]
+                <tr>
                    <td>[% item.barcode | html %]</td>
                    <td>[% item.biblio.title _ item.biblio.subtitle %]</td>
-                [% END %]
-            </tr>
+                   <td>[% INCLUDE 'patron-title.inc' patron=item.checkout.patron hide_patron_infos_if_needed=1 %]</td>
+                </tr>
+            [% END %]
         </tbody>
     </table>
     [% ELSE %]
