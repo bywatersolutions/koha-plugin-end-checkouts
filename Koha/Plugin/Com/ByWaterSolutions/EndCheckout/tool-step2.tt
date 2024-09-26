@@ -38,6 +38,7 @@
 
     [% IF return_items.size %]
     <form method="post">
+	[% INCLUDE 'csrf-token.inc' %]
         <input type="hidden" name="class" value="[% CLASS %]"/>
         <input type="hidden" name="method" value="[% METHOD %]"/>
 
